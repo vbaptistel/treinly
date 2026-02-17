@@ -2,6 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm --filter @treinly/validation build && pnpm --filter web build",
+  "buildCommand": "cd ../.. && pnpm --filter @treinly/validation build && pnpm --filter site build",
   "outputDirectory": ".next"
 }

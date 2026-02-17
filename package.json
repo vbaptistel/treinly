@@ -5,10 +5,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"pnpm --filter web dev\" \"pnpm --filter api start:dev\"",
-    "dev:web": "pnpm --filter web dev",
+    "dev": "concurrently \"pnpm --filter site dev\" \"pnpm --filter admin dev\" \"pnpm --filter api start:dev\"",
+    "dev:site": "pnpm --filter site dev",
+    "dev:admin": "pnpm --filter admin dev",
     "dev:api": "pnpm --filter api start:dev",
-    "build": "pnpm --filter @treinly/validation build && pnpm --filter web build && pnpm --filter api build",
+    "build": "pnpm --filter @treinly/validation build && pnpm --filter site build && pnpm --filter admin build && pnpm --filter api build",
     "build:validation": "pnpm --filter @treinly/validation build",
     "db:generate": "pnpm --filter api db:generate"
   },

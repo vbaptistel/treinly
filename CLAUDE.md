@@ -20,7 +20,8 @@ Treinly is a **web-only SaaS** for fitness professionals (personal trainers, sma
 ## Monorepo Structure
 
 ```
-/apps/web          # Next.js 16 (App Router)
+/apps/site         # Next.js 16 — app para clientes (agendamento público, temas, gerenciar agendamento)
+/apps/admin        # Next.js 16 — painel do profissional (agenda, pendências, clientes)
 /apps/api          # NestJS (Prisma schema + migrations in apps/api/prisma/)
 /packages/validation  # Shared Zod schemas
 /docs              # Product and technical documentation
@@ -37,9 +38,13 @@ Treinly is a **web-only SaaS** for fitness professionals (personal trainers, sma
 
 ## Build & Dev Commands
 
+- `pnpm dev` — sobe site, admin e API em paralelo.
+- `pnpm dev:site`, `pnpm dev:admin`, `pnpm dev:api` — sobem cada app isoladamente.
+- `pnpm build` — build de validation, site, admin e api.
+
 When building out, expect:
 - Package manager workspace (pnpm/npm workspaces)
-- `packages/validation` consumed by both `apps/web` and `apps/api`
+- `packages/validation` consumed by `apps/site`, `apps/admin` and `apps/api`
 - Prisma commands run from `apps/api`
 
 ## Architecture (Critical Patterns)
@@ -91,11 +96,17 @@ When building out, expect:
 
 ## Next.js Routing
 
-- `app/(public)/@slug/page.tsx` — SSR public profile
-- `app/(public)/@slug/agendar/page.tsx` — SSR wrapper + client wizard
-- `app/(public)/m/apt/[token]/page.tsx` — SSR manage appointment
-- `app/(app)/app/*` — panel routes, protected by Supabase session middleware
-- Next always calls NestJS API (public: no auth; panel: `Authorization: Bearer <supabase_jwt>`)
+**apps/site** (clientes):
+- `/` — SSR public profile (slug via middleware: subdomínio / custom domain / `?_slug=` em dev)
+- `/agendar` — SSR wrapper + client wizard
+- `/m/apt/[token]` — SSR manage appointment
+- Middleware injeta `x-tenant-slug` para rotas que precisam do tenant.
+
+**apps/admin** (painel do profissional):
+- `/` — agenda; `/pendencias` — pendências de pagamento; `/clientes`, `/clientes/[id]` — clientes
+- Auth via cookie `sb-access-token` (Supabase); chamadas à API com `Authorization: Bearer <token>`.
+
+Ambas as apps chamam a NestJS API (`NEXT_PUBLIC_API_URL`).
 
 ## Enums
 

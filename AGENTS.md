@@ -20,7 +20,7 @@ Qualquer feature nova deve manter simplicidade e reduzir esforço operacional.
 ## 3) Decisões fixas do projeto (V1)
 
 - SaaS **web-only**
-- **Next.js 16 App Router** (SSR no perfil público; wizard client no agendamento)
+- **Next.js 16 App Router** em duas apps: **apps/site** (clientes — perfil, agendar, gerenciar agendamento) e **apps/admin** (painel — agenda, pendências, clientes)
 - **NestJS** como única API
 - **Supabase Postgres** como DB
 - **Prisma** como ORM

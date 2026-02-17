@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { authApiFetch, ApiError } from '@/lib/auth-api';
+import { getToken } from '@/lib/auth';
 
 interface Appointment {
   id: string;
@@ -242,10 +243,4 @@ export default function AgendaPage() {
       )}
     </div>
   );
-}
-
-function getToken(): string | null {
-  if (typeof document === 'undefined') return null;
-  const match = document.cookie.match(/(?:^|;\s*)sb-access-token=([^;]*)/);
-  return match?.[1] ?? null;
 }

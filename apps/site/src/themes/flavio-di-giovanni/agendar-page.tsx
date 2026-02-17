@@ -28,11 +28,11 @@ export default function FlavioAgendarPage({
       {/* Header simplificado */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-black/90 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between py-4">
-          <Link href={`/${slug}`} className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors">
+          <Link href="/" className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="h-5 w-5" />
             <span className="text-sm font-medium uppercase tracking-wider">Voltar</span>
           </Link>
-          <Link href={`/${slug}`}>
+          <Link href="/">
             <Image
               src={`${IMG}/flavio-logo.png`}
               alt="Flávio Di Giovanni"
