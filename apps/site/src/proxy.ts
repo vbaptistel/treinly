@@ -28,13 +28,14 @@ function extractSubdomainSlug(host: string): string | null {
 
 export async function proxy(request: NextRequest) {
   const host = request.nextUrl.hostname;
-  console.log('---- HEADERS ----');
+  const url = new URL(request.url);
   const debug = {
     host: request.headers.get('host'),
     xForwardedHost: request.headers.get('x-forwarded-host'),
     xForwardedProto: request.headers.get('x-forwarded-proto'),
     xRealIp: request.headers.get('x-real-ip'),
     nextUrl: request.nextUrl.href,
+    url: url.href,
   };
 
   console.log(debug);
