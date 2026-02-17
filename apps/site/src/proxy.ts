@@ -27,7 +27,7 @@ function extractSubdomainSlug(host: string): string | null {
 }
 
 export async function proxy(request: NextRequest) {
-  const host = request.headers.get('x-forwarded-host') ?? '';
+  const host = request.nextUrl.hostname;
 
   let slug: string | null = null;
 
