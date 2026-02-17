@@ -48,48 +48,48 @@ Arquivo para acompanhar progresso. Marque com `[x]` quando concluído.
 ## Milestone 2 — Agendamento público
 
 ### Fase 2.1 — Disponibilidade
-- [ ] Tabelas `tenant_availability_rules` e `tenant_time_off`
-- [ ] API GET /public/:slug/availability?serviceId=...&date=...
-- [ ] Cálculo de slots service-aware (slot_minutes, min_notice_minutes)
-- [ ] Considerar timezone do tenant
+- [x] Tabelas `tenant_availability_rules` e `tenant_time_off`
+- [x] API GET /public/:slug/availability?serviceId=...&date=...
+- [x] Cálculo de slots service-aware (slot_minutes, min_notice_minutes)
+- [x] Considerar timezone do tenant
 
 ### Fase 2.2 — POST /public/:slug/appointments
-- [ ] Validação com PublicCreateAppointmentSchema
-- [ ] Upsert customer por (tenant_id, phone_e164)
-- [ ] Regra 1 agendamento/dia (PUBLIC)
-- [ ] busy_start_at / busy_end_at com buffers
-- [ ] Inserção respeitando EXCLUDE constraint
-- [ ] Ledger BOOKED_CONSUME se plano ativo com saldo
-- [ ] billing_status COVERED ou PENDING
-- [ ] Gerar public_manage_token e manageUrl
-- [ ] Tratar 409 overlap e 409 1/dia
+- [x] Validação com PublicCreateAppointmentSchema
+- [x] Upsert customer por (tenant_id, phone_e164)
+- [x] Regra 1 agendamento/dia (PUBLIC)
+- [x] busy_start_at / busy_end_at com buffers
+- [x] Inserção respeitando EXCLUDE constraint
+- [x] Ledger BOOKED_CONSUME se plano ativo com saldo
+- [x] billing_status COVERED ou PENDING
+- [x] Gerar public_manage_token e manageUrl
+- [x] Tratar 409 overlap e 409 1/dia
 
 ### Fase 2.3 — Wizard frontend
-- [ ] Wizard 3 passos: serviço → data/slot → dados
-- [ ] React Hook Form + Zod Resolver
-- [ ] Chamada POST e tratamento de erros
+- [x] Wizard 3 passos: serviço → data/slot → dados
+- [x] React Hook Form + Zod Resolver
+- [x] Chamada POST e tratamento de erros
 
 ---
 
 ## Milestone 3 — Cancelamento e ledger
 
 ### Fase 3.1 — manage_url
-- [ ] manageUrl no retorno do POST appointments
+- [x] manageUrl no retorno do POST appointments
 
 ### Fase 3.2 — GET /public/appointments/manage/:token
-- [ ] Endpoint retorna status, tenantSlug, serviceName, startAt, canCancel, cancelBeforeHours
-- [ ] 404 para token inválido/expirado
+- [x] Endpoint retorna status, tenantSlug, serviceName, startAt, canCancel, cancelBeforeHours
+- [x] 404 para token inválido/expirado
 
 ### Fase 3.3 — Cancelamento público
-- [ ] POST /public/appointments/manage/:token/cancel
-- [ ] Validação prazo (cancel_before_hours)
-- [ ] status=CANCELED, canceled_by=PUBLIC
-- [ ] Ledger CANCELED_REFUND e estorno sessions_used
-- [ ] 409 prazo excedido
+- [x] POST /public/appointments/manage/:token/cancel
+- [x] Validação prazo (cancel_before_hours)
+- [x] status=CANCELED, canceled_by=PUBLIC
+- [x] Ledger CANCELED_REFUND e estorno sessions_used
+- [x] 409 prazo excedido
 
 ### Fase 3.4 — Página manage
-- [ ] SSR `app/(public)/m/apt/[token]/page.tsx`
-- [ ] Exibir dados do agendamento e botão cancelar
+- [x] SSR `app/(public)/m/apt/[token]/page.tsx`
+- [x] Exibir dados do agendamento e botão cancelar
 
 ---
 
@@ -191,7 +191,7 @@ Implementação do plano em [docs/HOTSITE_THEMES.md](docs/HOTSITE_THEMES.md): UR
 |-----------|-------|-----------|
 | M1 Fundação | 6 | 5/6 |
 | M2 Agendamento | 3 | 0/3 |
-| M3 Cancelamento | 4 | 0/4 |
+| M3 Cancelamento | 4 | 4/4 |
 | M4 Painel | 5 | 0/5 |
 | M5 Billing | 4 | 0/4 |
 | M6 Hotsite (subdomínio, temas, branding) | 7 | 0/7 |

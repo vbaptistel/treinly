@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+export const AvailabilityQuerySchema = z.object({
+  serviceId: z.string().uuid(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+
+export type AvailabilityQuery = z.infer<typeof AvailabilityQuerySchema>;
+
 export const PublicCreateAppointmentSchema = z.object({
   serviceId: z.string().uuid(),
   startAt: z.string().datetime(),
