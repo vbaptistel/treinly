@@ -33,6 +33,9 @@ CREATE TABLE "tenants" (
     "timezone" TEXT NOT NULL DEFAULT 'America/Sao_Paulo',
     "rules" JSONB NOT NULL DEFAULT '{"cancel_before_hours":12,"package_validity_days_default":60,"min_notice_minutes_default":120}',
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "public_theme_id" TEXT NOT NULL DEFAULT 'default',
+    "public_page_themes" JSONB,
+    "public_branding" JSONB,
 
     CONSTRAINT "tenants_pkey" PRIMARY KEY ("id")
 );
@@ -166,6 +169,15 @@ CREATE TABLE "saas_subscriptions" (
     CONSTRAINT "saas_subscriptions_pkey" PRIMARY KEY ("tenant_id")
 );
 
+-- CreateTable
+CREATE TABLE "tenant_custom_domains" (
+    "id" UUID NOT NULL,
+    "tenant_id" UUID NOT NULL,
+    "host" TEXT NOT NULL,
+
+    CONSTRAINT "tenant_custom_domains_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "tenants_slug_key" ON "tenants"("slug");
 
@@ -180,6 +192,9 @@ CREATE INDEX "appointments_tenant_id_start_at_idx" ON "appointments"("tenant_id"
 
 -- CreateIndex
 CREATE UNIQUE INDEX "plan_session_ledger_appointment_id_reason_key" ON "plan_session_ledger"("appointment_id", "reason");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tenant_custom_domains_host_key" ON "tenant_custom_domains"("host");
 
 -- AddForeignKey
 ALTER TABLE "tenant_users" ADD CONSTRAINT "tenant_users_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -222,3 +237,6 @@ ALTER TABLE "plan_session_ledger" ADD CONSTRAINT "plan_session_ledger_appointmen
 
 -- AddForeignKey
 ALTER TABLE "saas_subscriptions" ADD CONSTRAINT "saas_subscriptions_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tenant_custom_domains" ADD CONSTRAINT "tenant_custom_domains_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -3,7 +3,7 @@
 ## Milestone 1 (Sprint 1 recomendado)
 - Monorepo
 - packages/validation
-- packages/db com Prisma base
+- Prisma base em apps/api
 - Supabase Auth (profissional)
 - tenants + tenant_users
 - CRUD services (painel)

@@ -1,8 +1,17 @@
-import { PrismaClient } from '../generated/prisma/client.js';
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "generated/prisma/client";
 
-const prisma = new PrismaClient();
 
 async function main() {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("Variável DATABASE_URL não configurada.");
+  }
+
+  const adapter = new PrismaPg({ connectionString });
+
+  const prisma = new PrismaClient({ adapter });
+
   // Ensure every tenant has a saas_subscription (TRIAL by default)
   const tenants = await prisma.tenant.findMany({
     select: { id: true },
@@ -27,5 +36,4 @@ main()
   .catch((e) => {
     console.error(e);
     process.exit(1);
-  })
-  .finally(() => prisma.$disconnect());
+  });

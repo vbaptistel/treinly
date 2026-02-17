@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
+import { getTenantSlug } from '@/lib/get-tenant-slug';
 import { apiFetch } from '@/lib/api';
-import { BookingWizard } from './booking-wizard';
+import { loadThemePage } from '@/themes/registry';
 
 interface TenantPublicData {
   tenant: {
@@ -8,6 +9,9 @@ interface TenantPublicData {
     slug: string;
     timezone: string;
     rules: { cancel_before_hours: number };
+    themeId: string;
+    pageThemes: Record<string, string> | null;
+    branding: Record<string, string> | null;
   };
   services: {
     id: string;
@@ -19,12 +23,10 @@ interface TenantPublicData {
   }[];
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
+export async function generateMetadata() {
+  const slug = await getTenantSlug();
+  if (!slug) return { title: 'Profissional não encontrado' };
+
   try {
     const data = await apiFetch<TenantPublicData>(`/public/${slug}`);
     return {
@@ -37,13 +39,13 @@ export async function generateMetadata({
 }
 
 export default async function AgendarPage({
-  params,
   searchParams,
 }: {
-  params: Promise<{ slug: string }>;
   searchParams: Promise<{ serviceId?: string }>;
 }) {
-  const { slug } = await params;
+  const slug = await getTenantSlug();
+  if (!slug) notFound();
+
   const { serviceId } = await searchParams;
 
   let data: TenantPublicData;
@@ -53,21 +55,18 @@ export default async function AgendarPage({
     notFound();
   }
 
+  const AgendarThemePage = await loadThemePage(
+    data.tenant.themeId,
+    'agendar',
+    data.tenant.pageThemes,
+  );
+
   return (
-    <div className="mx-auto min-h-screen max-w-2xl px-4 py-12">
-      <header className="mb-10 text-center">
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-          {data.tenant.name}
-        </h1>
-        <p className="mt-2 text-zinc-500 dark:text-zinc-400">
-          Agendar horário
-        </p>
-      </header>
-      <BookingWizard
-        slug={slug}
-        services={data.services}
-        initialServiceId={serviceId}
-      />
-    </div>
+    <AgendarThemePage
+      tenant={data.tenant}
+      services={data.services}
+      slug={slug}
+      initialServiceId={serviceId}
+    />
   );
 }

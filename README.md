@@ -20,9 +20,8 @@ SaaS **web-only** para profissionais de fitness (personal trainers, pequenas cl�
 ```
 apps/
   web/          # Next.js 16 (App Router)
-  api/          # NestJS
+  api/          # NestJS (Prisma schema + migrations em apps/api/prisma/)
 packages/
-  db/           # Prisma (schema + migrations)
   validation/   # Schemas Zod compartilhados
 docs/           # Documentação de produto e técnica
 ```
@@ -52,7 +51,7 @@ docs/           # Documentação de produto e técnica
 
    ```bash
    pnpm db:generate
-   # Aplicar migrações: dentro de packages/db, conforme docs (Prisma + passos manuais para EXCLUDE)
+   # Aplicar migrações: dentro de apps/api, conforme docs (Prisma + passos manuais para EXCLUDE)
    ```
 
 4. **Rodar em desenvolvimento**
@@ -71,7 +70,7 @@ docs/           # Documentação de produto e técnica
 | `pnpm dev:web`     | Apenas Next.js |
 | `pnpm dev:api`     | Apenas NestJS |
 | `pnpm build`       | Build de validation, web e api |
-| `pnpm db:generate` | Gera cliente Prisma em `packages/db` |
+| `pnpm db:generate` | Gera cliente Prisma em `apps/api` |
 
 ## Documentação
 

@@ -10,7 +10,7 @@ Arquivo para acompanhar progresso. Marque com `[x]` quando concluído.
 
 ### Fase 1.1 — Monorepo
 - [x] pnpm workspaces configurado
-- [x] Estrutura `apps/web`, `apps/api`, `packages/db`, `packages/validation`
+- [x] Estrutura `apps/web`, `apps/api`, `packages/validation`
 - [x] TypeScript compartilhado
 - [x] ESLint e Prettier
 
@@ -20,7 +20,7 @@ Arquivo para acompanhar progresso. Marque com `[x]` quando concluído.
 - [x] `PublicCancelAppointmentSchema`
 - [x] Exportar tipos inferidos
 
-### Fase 1.3 — packages/db
+### Fase 1.3 — Prisma (apps/api)
 - [x] Prisma schema (tenants, tenant_users, services, customers, appointments, etc.)
 - [x] Migration inicial via Prisma
 - [x] Migration SQL manual: `btree_gist` + EXCLUDE constraint
@@ -150,30 +150,31 @@ Arquivo para acompanhar progresso. Marque com `[x]` quando concluído.
 Implementação do plano em [docs/HOTSITE_THEMES.md](docs/HOTSITE_THEMES.md): URLs por subdomínio/custom domain (sem slug na URL), tema default com branding (imagens, fontes, cores) e temas 100% custom com override por página.
 
 ### Fase 6.1 — Resolução por host (middleware)
-- [ ] Middleware Next.js: resolver Host da requisição → slug
-- [ ] Subdomínio: convenção (ex. `joao.treinly.com` → slug `joao`)
-- [ ] Custom domain: tabela ou campo (ex. `tenant_custom_domains` ou `tenant.custom_domain`) e lookup/cache
-- [ ] Injetar slug (ou tenant_id) em header/context para as páginas
+- [x] Middleware Next.js: resolver Host da requisição → slug
+- [x] Subdomínio: convenção (ex. `joao.treinly.com` → slug `joao`)
+- [x] Custom domain: tabela `tenant_custom_domains` e lookup via API `GET /public/resolve-host`
+- [x] Injetar slug em header `x-tenant-slug` para as páginas
 
 ### Fase 6.2 — Rotas públicas sem slug na URL
-- [ ] Migrar/duplicar para rotas sem `[slug]`: `(public)/page.tsx` (perfil) e `(public)/agendar/page.tsx`
-- [ ] Slug obtido do contexto (middleware); 404 ou fallback quando host não resolver para tenant
-- [ ] Manter compatibilidade ou desativar rotas antigas `(public)/[slug]/...` conforme decisão de produto
+- [x] Migrar para rotas sem `[slug]`: `(public)/page.tsx` (perfil) e `(public)/agendar/page.tsx`
+- [x] Slug obtido do contexto (middleware via `getTenantSlug()`); 404 quando host não resolver para tenant
+- [x] Rotas antigas `(public)/[slug]/...` removidas; booking-wizard movido para `components/`
 
 ### Fase 6.3 — Modelo de dados: temas e branding
-- [ ] Schema: `public_theme_id` (string, default `"default"`), `public_page_themes` (JSON opcional)
-- [ ] Schema: branding para tema default — `public_branding` (JSON) ou campos (logo_url, hero_image_url, primary_color, font_heading, font_body, etc.)
-- [ ] API GET `/public/:slug`: incluir `themeId`, `pageThemes`, `branding` na resposta
+- [x] Schema: `public_theme_id` (string, default `"default"`), `public_page_themes` (JSON opcional)
+- [x] Schema: `public_branding` (JSON) + `TenantCustomDomain` model
+- [x] API GET `/public/:slug`: inclui `themeId`, `pageThemes`, `branding` na resposta
+- [x] Interface `PublicBranding` em `packages/validation`
 
 ### Fase 6.4 — Tema default parametrizado por branding
-- [ ] Tema `themes/default/`: ProfilePage e AgendarPage (ou wizard compartilhado) recebem `tenant.branding`
-- [ ] Aplicar imagens (logo, hero), fontes e cores via CSS variables / props
-- [ ] Resolver `themeId` efetivo por página: `pageThemes[pageKey] ?? themeId`
+- [x] Tema `themes/default/`: ProfilePage e AgendarPage recebem `tenant.branding`
+- [x] Aplicar imagens (logo, hero), fontes e cores via CSS variables / props
+- [x] Resolver `themeId` efetivo por página: `pageThemes[pageKey] ?? themeId`
 
 ### Fase 6.5 — Registry de temas e carregamento por página
-- [ ] Carregar componente do tema por (themeId, pageKey) — dynamic import ou registry
-- [ ] Fallback: página não existente no tema custom → tema base
-- [ ] Documentar interface mínima por página (props) e convenção de pastas
+- [x] Carregar componente do tema por (themeId, pageKey) — dynamic import via registry
+- [x] Fallback: página não existente no tema custom → tema base (default)
+- [x] Interface mínima por página (props) definida em `themes/types.ts`
 
 ### Fase 6.6 — Painel: edição de branding (opcional V1)
 - [ ] CRUD ou edição de branding no painel (logo, cores, fontes) para tema default
@@ -194,4 +195,4 @@ Implementação do plano em [docs/HOTSITE_THEMES.md](docs/HOTSITE_THEMES.md): UR
 | M3 Cancelamento | 4 | 4/4 |
 | M4 Painel | 5 | 5/5 |
 | M5 Billing | 4 | 4/4 |
-| M6 Hotsite (subdomínio, temas, branding) | 7 | 0/7 |
+| M6 Hotsite (subdomínio, temas, branding) | 7 | 5/7 |

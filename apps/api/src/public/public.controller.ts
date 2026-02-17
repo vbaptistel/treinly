@@ -33,6 +33,12 @@ export class PublicController {
     return this.publicService.cancelAppointmentByToken(token, data);
   }
 
+  @Public()
+  @Get('resolve-host')
+  resolveHost(@Query('host') host: string) {
+    return this.publicService.resolveHost(host);
+  }
+
   // Slug-based routes
   @Public()
   @Get(':slug')

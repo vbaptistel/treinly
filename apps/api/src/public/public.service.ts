@@ -6,12 +6,25 @@ import {
 } from '@nestjs/common';
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service.js';
-import type { PrismaClient } from '@treinly/db';
+import type { PrismaClient } from '../../generated/prisma/client.js';
 import type { AvailabilityQuery, PublicCreateAppointment, PublicCancelAppointment } from '@treinly/validation';
 
 @Injectable()
 export class PublicService {
   constructor(private prisma: PrismaService) {}
+
+  async resolveHost(host: string) {
+    const customDomain = await this.prisma.tenantCustomDomain.findUnique({
+      where: { host },
+      select: { tenant: { select: { slug: true } } },
+    });
+
+    if (!customDomain) {
+      throw new NotFoundException('Host não encontrado');
+    }
+
+    return { slug: customDomain.tenant.slug };
+  }
 
   async findTenantBySlug(slug: string) {
     const tenant = await this.prisma.tenant.findUnique({
@@ -22,6 +35,9 @@ export class PublicService {
         slug: true,
         timezone: true,
         rules: true,
+        publicThemeId: true,
+        publicPageThemes: true,
+        publicBranding: true,
       },
     });
 
@@ -44,7 +60,15 @@ export class PublicService {
 
     const { id: _, ...tenantData } = tenant;
 
-    return { tenant: tenantData, services };
+    return {
+      tenant: {
+        ...tenantData,
+        themeId: tenantData.publicThemeId,
+        pageThemes: tenantData.publicPageThemes,
+        branding: tenantData.publicBranding,
+      },
+      services,
+    };
   }
 
   async getAvailability(slug: string, query: AvailabilityQuery) {

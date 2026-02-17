@@ -5,7 +5,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import type { PrismaClient } from '@treinly/db';
+import type { PrismaClient } from '../../generated/prisma/client.js';
 import type { AppointmentsQuery, PatchAppointment } from '@treinly/validation';
 
 @Injectable()

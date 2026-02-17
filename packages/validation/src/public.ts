@@ -23,3 +23,15 @@ export const PublicCancelAppointmentSchema = z.object({
 });
 
 export type PublicCancelAppointment = z.infer<typeof PublicCancelAppointmentSchema>;
+
+export interface PublicBranding {
+  logoUrl?: string;
+  heroImageUrl?: string;
+  faviconUrl?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  fontHeading?: string;
+  fontBody?: string;
+}

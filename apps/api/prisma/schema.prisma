@@ -101,6 +101,10 @@ model Tenant {
   rules     Json     @default("{\"cancel_before_hours\":12,\"package_validity_days_default\":60,\"min_notice_minutes_default\":120}")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
+  publicThemeId    String @default("default") @map("public_theme_id")
+  publicPageThemes Json?  @map("public_page_themes")
+  publicBranding   Json?  @map("public_branding")
+
   tenantUsers       TenantUser[]
   services          Service[]
   customers         Customer[]
@@ -110,6 +114,7 @@ model Tenant {
   appointments      Appointment[]
   ledgerEntries     PlanSessionLedger[]
   saasSubscription  SaasSubscription?
+  customDomains     TenantCustomDomain[]
 
   @@map("tenants")
   @@schema("treinly")
@@ -278,5 +283,16 @@ model SaasSubscription {
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@map("saas_subscriptions")
+  @@schema("treinly")
+}
+
+model TenantCustomDomain {
+  id       String @id @default(uuid()) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
+  host     String @unique
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_custom_domains")
   @@schema("treinly")
 }

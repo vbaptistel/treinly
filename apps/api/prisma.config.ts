@@ -11,7 +11,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: databaseUrl,
-    directUrl: process.env.DIRECT_URL,
+    url: databaseUrl
   },
 });

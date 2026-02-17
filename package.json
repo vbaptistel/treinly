@@ -10,7 +10,7 @@
     "dev:api": "pnpm --filter api start:dev",
     "build": "pnpm --filter @treinly/validation build && pnpm --filter web build && pnpm --filter api build",
     "build:validation": "pnpm --filter @treinly/validation build",
-    "db:generate": "pnpm --filter @treinly/db db:generate"
+    "db:generate": "pnpm --filter api db:generate"
   },
   "keywords": [],
   "author": "",
@@ -19,5 +19,9 @@
   "devDependencies": {
     "concurrently": "^9.2.1",
     "prettier": "^3.8.1"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.4.0",
+    "api": "^6.1.3"
   }
 }

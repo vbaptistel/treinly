@@ -21,8 +21,7 @@ Treinly is a **web-only SaaS** for fitness professionals (personal trainers, sma
 
 ```
 /apps/web          # Next.js 16 (App Router)
-/apps/api          # NestJS
-/packages/db       # Prisma schema + migrations
+/apps/api          # NestJS (Prisma schema + migrations in apps/api/prisma/)
 /packages/validation  # Shared Zod schemas
 /docs              # Product and technical documentation
 ```
@@ -33,7 +32,7 @@ Treinly is a **web-only SaaS** for fitness professionals (personal trainers, sma
 - Monorepo: `pnpm init`, `pnpm-workspace.yaml`
 - Next.js: `pnpm create next-app@latest apps/web --typescript --tailwind --eslint --app --use-pnpm`
 - NestJS: `npx @nestjs/cli new api --package-manager pnpm --skip-git --directory apps/api`
-- Prisma: `pnpm exec prisma init` (inside packages/db)
+- Prisma: `pnpm exec prisma init` (inside apps/api)
 - Packages: `pnpm init` + `pnpm add <deps>` + `pnpm exec <tool> init`
 
 ## Build & Dev Commands
@@ -41,7 +40,7 @@ Treinly is a **web-only SaaS** for fitness professionals (personal trainers, sma
 When building out, expect:
 - Package manager workspace (pnpm/npm workspaces)
 - `packages/validation` consumed by both `apps/web` and `apps/api`
-- Prisma commands run from `packages/db`
+- Prisma commands run from `apps/api`
 
 ## Architecture (Critical Patterns)
 
