@@ -33,7 +33,7 @@ export async function generateMetadata() {
       title: `${data.tenant.name}`,
       description: `Agende seu horário com ${data.tenant.name}`,
       ...(slug !== 'default' && {
-        icons: { icon: `/themes/${slug}/favicon.ico` },
+        icons: [{ url: `/themes/${slug}/favicon.ico`, rel: 'icon' }],
       }),
     };
   } catch {
