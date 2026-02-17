@@ -45,7 +45,8 @@ export async function proxy(request: NextRequest) {
     const isPlatform =
       PLATFORM_HOSTS.includes(hostname) ||
       hostname === 'localhost' ||
-      isIP(hostname);
+      isIP(hostname) ||
+      hostname.endsWith('.vercel.app');
 
     if (!isPlatform) {
       try {
