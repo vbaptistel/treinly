@@ -4,7 +4,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { apiFetch, ApiError } from '@/lib/api';
+import {
+  getAvailability,
+  createAppointment,
+  type BookingResult,
+} from '@/app/actions/public';
 
 // --- Types ---
 
@@ -15,13 +19,6 @@ interface Service {
   slotMinutes: number;
   minNoticeMinutes: number;
   priceCents: number | null;
-}
-
-interface BookingResult {
-  appointmentId: string;
-  billingStatus: string;
-  manageToken: string;
-  manageUrl: string;
 }
 
 // --- Zod schema for step 3 (client data) ---
@@ -116,24 +113,21 @@ export function BookingWizard({ slug, services, initialServiceId }: BookingWizar
     setStep(2);
   }
 
-  // Step 2: Select date and slot
+  // Step 2: Select date and slot (via server action — evita CORS)
   async function handleSelectDate(date: string) {
     if (!selectedService) return;
     setSelectedDate(date);
     setSelectedSlot(null);
     setError(null);
     setLoadingSlots(true);
-    try {
-      const data = await apiFetch<{ date: string; slots: string[] }>(
-        `/public/${slug}/availability?serviceId=${selectedService.id}&date=${date}`,
-      );
-      setSlots(data.slots);
-    } catch {
+    const result = await getAvailability(slug, selectedService.id, date);
+    setLoadingSlots(false);
+    if ('error' in result) {
       setSlots([]);
-      setError('Erro ao carregar horários disponíveis.');
-    } finally {
-      setLoadingSlots(false);
+      setError(result.error);
+      return;
     }
+    setSlots(result.data.slots);
   }
 
   function handleSelectSlot(slot: string) {
@@ -142,40 +136,26 @@ export function BookingWizard({ slug, services, initialServiceId }: BookingWizar
     setStep(3);
   }
 
-  // Step 3: Submit
+  // Step 3: Submit (via server action — evita CORS)
   async function onSubmit(data: ClientData) {
     if (!selectedService || !selectedSlot) return;
     setSubmitting(true);
     setError(null);
-    try {
-      const res = await apiFetch<BookingResult>(`/public/${slug}/appointments`, {
-        method: 'POST',
-        body: JSON.stringify({
-          serviceId: selectedService.id,
-          startAt: selectedSlot,
-          fullName: data.fullName,
-          phone: data.phone,
-          email: data.email || undefined,
-          notes: data.notes || undefined,
-        }),
-      });
-      setResult(res);
-      setStep(4);
-    } catch (err) {
-      if (err instanceof ApiError) {
-        if (err.status === 409) {
-          setError(err.body?.message ?? 'Horário indisponível ou limite de agendamento atingido.');
-        } else if (err.status === 400) {
-          setError('Dados inválidos. Verifique os campos e tente novamente.');
-        } else {
-          setError('Erro ao criar agendamento. Tente novamente.');
-        }
-      } else {
-        setError('Erro de conexão. Tente novamente.');
-      }
-    } finally {
-      setSubmitting(false);
+    const result = await createAppointment(slug, {
+      serviceId: selectedService.id,
+      startAt: selectedSlot,
+      fullName: data.fullName,
+      phone: data.phone,
+      email: data.email || undefined,
+      notes: data.notes || undefined,
+    });
+    setSubmitting(false);
+    if ('error' in result) {
+      setError(result.error);
+      return;
     }
+    setResult(result.data);
+    setStep(4);
   }
 
   function goBack() {

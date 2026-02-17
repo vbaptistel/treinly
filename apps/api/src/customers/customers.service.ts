@@ -1,7 +1,11 @@
 import { Injectable, BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { SupabaseService } from '../supabase/supabase.service.js';
-import type { CreateCustomer, CreatePlan } from '@treinly/validation';
+import type {
+  CreateCustomer,
+  CreatePlan,
+  CustomersQuery,
+} from '@treinly/validation';
 
 @Injectable()
 export class CustomersService {
@@ -10,9 +14,26 @@ export class CustomersService {
     private supabaseService: SupabaseService,
   ) {}
 
-  findAll(tenantId: string) {
+  findAll(tenantId: string, query?: CustomersQuery) {
+    const q = query?.q?.trim();
+    const where: { tenantId: string; OR?: Array<object> } = { tenantId };
+
+    if (q && q.length > 0) {
+      const digits = q.replace(/\D/g, '');
+      const orConditions: Array<object> = [
+        { fullName: { contains: q, mode: 'insensitive' as const } },
+      ];
+      orConditions.push({
+        email: { contains: q, mode: 'insensitive' as const },
+      });
+      if (digits.length >= 2) {
+        orConditions.push({ phoneE164: { contains: digits } });
+      }
+      where.OR = orConditions;
+    }
+
     return this.prisma.customer.findMany({
-      where: { tenantId },
+      where,
       orderBy: { fullName: 'asc' },
     });
   }

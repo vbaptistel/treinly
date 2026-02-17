@@ -1,17 +1,28 @@
-import { Controller, Get, Post, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query } from '@nestjs/common';
 import { CustomersService } from './customers.service.js';
 import { CurrentTenantId } from '../auth/decorators.js';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe.js';
-import { CreateCustomerSchema, CreatePlanSchema } from '@treinly/validation';
-import type { CreateCustomer, CreatePlan } from '@treinly/validation';
+import {
+  CreateCustomerSchema,
+  CreatePlanSchema,
+  CustomersQuerySchema,
+} from '@treinly/validation';
+import type {
+  CreateCustomer,
+  CreatePlan,
+  CustomersQuery,
+} from '@treinly/validation';
 
 @Controller('customers')
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Get()
-  findAll(@CurrentTenantId() tenantId: string) {
-    return this.customersService.findAll(tenantId);
+  findAll(
+    @CurrentTenantId() tenantId: string,
+    @Query(new ZodValidationPipe(CustomersQuerySchema)) query: CustomersQuery,
+  ) {
+    return this.customersService.findAll(tenantId, query);
   }
 
   @Post()

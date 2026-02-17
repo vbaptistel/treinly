@@ -40,6 +40,12 @@ export type PatchAppointment = z.infer<typeof PatchAppointmentSchema>;
 
 // --- Customers ---
 
+export const CustomersQuerySchema = z.object({
+  q: z.string().min(1).optional(),
+});
+
+export type CustomersQuery = z.infer<typeof CustomersQuerySchema>;
+
 export const CreateCustomerSchema = z.object({
   fullName: z.string().min(1),
   phone: z.string().min(10),

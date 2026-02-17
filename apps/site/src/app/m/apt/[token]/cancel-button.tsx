@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiFetch, ApiError } from '@/lib/api';
+import { cancelAppointment } from '@/app/actions/public';
 
 interface CancelButtonProps {
   token: string;
@@ -17,20 +17,13 @@ export function CancelButton({ token }: CancelButtonProps) {
   async function handleCancel() {
     setSubmitting(true);
     setError(null);
-    try {
-      await apiFetch(`/public/appointments/manage/${token}/cancel`, {
-        method: 'POST',
-        body: JSON.stringify({}),
-      });
+    const result = await cancelAppointment(token);
+    if ('error' in result) {
+      setError(result.error);
+    } else {
       router.refresh();
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 409) {
-        setError(err.body?.message ?? 'Prazo para cancelamento expirado.');
-      } else {
-        setError('Erro ao cancelar. Tente novamente.');
-      }
-      setSubmitting(false);
     }
+    setSubmitting(false);
   }
 
   if (!confirming) {
