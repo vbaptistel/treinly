@@ -14,8 +14,9 @@ export class PublicService {
   constructor(private prisma: PrismaService) { }
 
   async resolveHost(host: string) {
+    const parsedHost = host.replace(/^www\./, '');
     const customDomain = await this.prisma.tenantCustomDomain.findUnique({
-      where: { host },
+      where: { host: parsedHost },
       select: { tenant: { select: { slug: true } } },
     });
 
