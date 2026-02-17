@@ -23,6 +23,13 @@
 - Backend normaliza `phone` para `phone_e164`.
 - Upsert por `(tenant_id, phone_e164)`.
 
+## Vínculo Customer → Supabase Auth
+
+- `customers.user_id` (nullable) referencia `auth.users.id`.
+- Customers criados via booking público **não** possuem `user_id` (permanece null).
+- Vínculo é feito via convite do profissional (`POST /customers/:id/invite`), que cria ou reutiliza conta no Supabase Auth.
+- Um mesmo `user_id` pode aparecer em múltiplos tenants (conta global).
+
 ## Roles
 
 - `tenant_users.role`: `OWNER`, `MEMBER`, `PLATFORM_ADMIN` (enum no Prisma).

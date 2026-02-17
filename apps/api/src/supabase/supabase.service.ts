@@ -31,4 +31,19 @@ export class SupabaseService {
     if (error) throw error;
     return { id: data.user.id, email: data.user.email! };
   }
+
+  async findOrCreateUserByEmail(email: string): Promise<{ id: string; email: string; created: boolean }> {
+    // Tenta convidar (cria user + envia email com link para definir senha)
+    const { data, error } = await this.client.auth.admin.inviteUserByEmail(email);
+    if (!error) {
+      return { id: data.user.id, email: data.user.email!, created: true };
+    }
+
+    // Se falhou porque user já existe, busca pelo email
+    const { data: listData, error: listError } = await this.client.auth.admin.listUsers();
+    if (listError) throw listError;
+    const existing = listData.users.find(u => u.email === email);
+    if (!existing) throw error; // erro original do invite
+    return { id: existing.id, email: existing.email!, created: false };
+  }
 }

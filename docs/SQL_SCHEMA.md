@@ -48,6 +48,7 @@ create table treinly.services (
 create table treinly.customers (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid not null references treinly.tenants(id) on delete cascade,
+  user_id uuid,  -- nullable; vincula a auth.users quando customer é convidado
   full_name text not null,
   phone_e164 text not null,
   email text,

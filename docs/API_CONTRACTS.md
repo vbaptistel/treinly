@@ -117,6 +117,16 @@ Retorna tenant do usuário + status da assinatura SaaS.
   - define sessions_total, valid_until
   - (futuro) renovar
 
+### Customer Invite
+- POST /customers/:id/invite
+  - Convida customer para criar conta no Supabase Auth (email + senha)
+  - Sem body — usa o email já cadastrado no customer
+  - Cria conta no Supabase Auth (ou reutiliza se email já existe) e vincula `user_id` ao customer
+  - **Erros:**
+    - 400: cliente sem email cadastrado
+    - 404: cliente não encontrado
+    - 409: cliente já possui conta (`user_id` já preenchido)
+
 ### Tenant Members (OWNER e PLATFORM_ADMIN)
 
 Requer `@Roles('OWNER', 'PLATFORM_ADMIN')`.

@@ -38,4 +38,12 @@ export class CustomersController {
   ) {
     return this.customersService.createPlan(tenantId, id, data);
   }
+
+  @Post(':id/invite')
+  invite(
+    @CurrentTenantId() tenantId: string,
+    @Param('id') id: string,
+  ) {
+    return this.customersService.invite(tenantId, id);
+  }
 }

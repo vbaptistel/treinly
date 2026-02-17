@@ -1,10 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { SupabaseService } from '../supabase/supabase.service.js';
 import type { CreateCustomer, CreatePlan } from '@treinly/validation';
 
 @Injectable()
 export class CustomersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private supabaseService: SupabaseService,
+  ) {}
 
   findAll(tenantId: string) {
     return this.prisma.customer.findMany({
@@ -74,6 +78,31 @@ export class CustomersService {
         sessionsTotal: data.sessionsTotal,
         validUntil: new Date(data.validUntil),
       },
+    });
+  }
+
+  async invite(tenantId: string, customerId: string) {
+    const customer = await this.prisma.customer.findFirst({
+      where: { id: customerId, tenantId },
+    });
+
+    if (!customer) {
+      throw new NotFoundException('Cliente não encontrado');
+    }
+
+    if (customer.userId) {
+      throw new ConflictException('Cliente já possui conta');
+    }
+
+    if (!customer.email) {
+      throw new BadRequestException('Cliente precisa ter email cadastrado para ser convidado');
+    }
+
+    const { id: userId } = await this.supabaseService.findOrCreateUserByEmail(customer.email);
+
+    return this.prisma.customer.update({
+      where: { id: customerId },
+      data: { userId },
     });
   }
 }

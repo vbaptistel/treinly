@@ -79,6 +79,12 @@ When building out, expect:
 - Backend normalizes to `phone_e164` (E.164 format, e.g., `+5511999999999`).
 - Customer dedup by `(tenant_id, phone_e164)`.
 
+### Customer Auth (Invite)
+- `Customer.userId` (nullable) vincula a `auth.users` do Supabase.
+- Booking público **não** cria conta — `userId` permanece null.
+- Profissional convida via `POST /customers/:id/invite` (usa email cadastrado).
+- `SupabaseService.findOrCreateUserByEmail()` cria ou reutiliza conta existente (conta global, pode estar em múltiplos tenants).
+
 ### Session Ledger
 - Every change to `sessions_used` must have a corresponding `plan_session_ledger` entry.
 - Booking: `delta=-1`, reason `BOOKED_CONSUME`.
