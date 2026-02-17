@@ -28,10 +28,11 @@ function extractSubdomainSlug(host: string): string | null {
 
 export async function proxy(request: NextRequest) {
   const host = request.nextUrl.hostname;
-  console.log('x-forwarded-host:', request.headers.get("x-forwarded-host") ?? 'not found');
-  console.log('x-forwarded-proto:', request.headers.get("x-forwarded-proto") ?? 'not found');
-  console.log('host:', request.headers.get("host") ?? 'not found');
-  console.log('nextUrl.hostname:', request.nextUrl.hostname);
+  console.log('---- HEADERS ----');
+  request.headers.forEach((v, k) => {
+    console.log(k, v);
+  });
+  console.log('nextUrl', request.nextUrl.href);
 
   let slug: string | null = null;
 
