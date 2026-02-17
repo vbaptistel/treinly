@@ -1,3 +1,13 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# Permite scripts de build dessas dependências (evita o warning do pnpm approve-builds)
+onlyBuiltDependencies:
+  - "@nestjs/core"
+  - "@prisma/engines"
+  - "es5-ext"
+  - "esbuild"
+  - "prisma"
+  - "sharp"
+  - "unrs-resolver"

@@ -29,9 +29,13 @@ export async function generateMetadata() {
 
   try {
     const data = await apiFetch<TenantPublicData>(`/public/${slug}`);
+    const themeId = data.tenant.themeId ?? 'default';
     return {
       title: `Agendar — ${data.tenant.name}`,
       description: `Agende seu horário com ${data.tenant.name}`,
+      ...(themeId !== 'default' && {
+        icons: { icon: `/themes/${themeId}/favicon.ico` },
+      }),
     };
   } catch {
     return { title: 'Profissional não encontrado' };

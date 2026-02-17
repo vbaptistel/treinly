@@ -368,7 +368,7 @@ export class PublicService {
       where: { publicManageToken: token },
       include: {
         service: { select: { name: true } },
-        tenant: { select: { slug: true, rules: true } },
+        tenant: { select: { slug: true, rules: true, publicThemeId: true } },
       },
     });
 
@@ -391,6 +391,7 @@ export class PublicService {
     return {
       status: appointment.status,
       tenantSlug: appointment.tenant.slug,
+      themeId: appointment.tenant.publicThemeId ?? 'default',
       serviceName: appointment.service.name,
       startAt: appointment.startAt.toISOString(),
       canCancel,

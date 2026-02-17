@@ -5,6 +5,7 @@ import { CancelButton } from './cancel-button';
 interface AppointmentData {
   status: string;
   tenantSlug: string;
+  themeId: string;
   serviceName: string;
   startAt: string;
   canCancel: boolean;
@@ -42,6 +43,9 @@ export async function generateMetadata({
     );
     return {
       title: `Agendamento — ${data.serviceName}`,
+      ...(data.themeId !== 'default' && {
+        icons: { icon: `/themes/${data.themeId}/favicon.ico` },
+      }),
     };
   } catch {
     return { title: 'Agendamento não encontrado' };
