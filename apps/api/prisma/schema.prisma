@@ -1,7 +1,8 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
-  schema   = "treinly"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  schema       = "treinly"
+  moduleFormat = "cjs"
 }
 
 datasource db {

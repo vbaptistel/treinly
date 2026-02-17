@@ -31,8 +31,14 @@ export async function proxy(request: NextRequest) {
 
   let slug: string | null = null;
 
+  // 0. Dev-only: query param ?_slug= para testar temas localmente
+  if (process.env.NODE_ENV === 'development') {
+    const qsSlug = request.nextUrl.searchParams.get('_slug');
+    if (qsSlug) slug = qsSlug;
+  }
+
   // 1. Tentar extrair slug do subdomínio
-  slug = extractSubdomainSlug(host);
+  if (!slug) slug = extractSubdomainSlug(host);
 
   // 2. Se não for subdomínio, verificar custom domain via API
   if (!slug) {

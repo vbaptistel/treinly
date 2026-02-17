@@ -23,7 +23,7 @@ coverage/
 *.tsbuildinfo
 
 # Prisma
-apps/api/generated/
+apps/api/src/generated/prisma/
 
 # Logs e temporários
 *.log

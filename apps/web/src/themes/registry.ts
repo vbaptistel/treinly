@@ -9,6 +9,10 @@ const themeRegistry: Record<string, Partial<Record<PageKey, ThemeModuleLoader>>>
     profile: () => import('./default/profile-page'),
     agendar: () => import('./default/agendar-page'),
   },
+  'flavio-di-giovanni': {
+    profile: () => import('./flavio-di-giovanni/profile-page'),
+    agendar: () => import('./flavio-di-giovanni/agendar-page'),
+  },
 };
 
 /**

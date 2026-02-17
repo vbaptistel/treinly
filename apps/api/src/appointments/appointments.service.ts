@@ -1,16 +1,16 @@
 import {
-  Injectable,
-  NotFoundException,
   BadRequestException,
   ConflictException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
-import type { PrismaClient } from '../../generated/prisma/client.js';
 import type { AppointmentsQuery, PatchAppointment } from '@treinly/validation';
+import type { PrismaClient } from '../generated/prisma/client.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class AppointmentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async findAll(tenantId: string, query: AppointmentsQuery) {
     return this.prisma.appointment.findMany({
@@ -68,7 +68,7 @@ export class AppointmentsService {
   }
 
   private async cancelAsAdmin(
-    appointment: { id: string; tenantId: string; status: string; billingStatus: string },
+    appointment: { id: string; tenantId: string; status: string; billingStatus: string; },
     reason?: string,
   ) {
     if (appointment.status !== 'BOOKED') {
@@ -117,7 +117,7 @@ export class AppointmentsService {
     });
   }
 
-  private async markNoShow(appointment: { id: string; status: string }) {
+  private async markNoShow(appointment: { id: string; status: string; }) {
     if (appointment.status !== 'BOOKED') {
       throw new ConflictException('Apenas agendamentos BOOKED podem ser marcados como no-show');
     }
@@ -130,7 +130,7 @@ export class AppointmentsService {
     return { status: 'NO_SHOW' };
   }
 
-  private async markDone(appointment: { id: string; status: string }) {
+  private async markDone(appointment: { id: string; status: string; }) {
     if (appointment.status !== 'BOOKED') {
       throw new ConflictException('Apenas agendamentos BOOKED podem ser marcados como realizados');
     }
@@ -144,7 +144,7 @@ export class AppointmentsService {
   }
 
   private async setBilling(
-    appointment: { id: string; billingStatus: string },
+    appointment: { id: string; billingStatus: string; },
     billingStatus?: string,
   ) {
     if (!billingStatus || !['PAID_MANUAL', 'WAIVED'].includes(billingStatus)) {

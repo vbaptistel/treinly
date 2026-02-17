@@ -1,14 +1,14 @@
-import { notFound } from 'next/navigation';
-import { getTenantSlug } from '@/lib/get-tenant-slug';
 import { apiFetch } from '@/lib/api';
+import { getTenantSlug } from '@/lib/get-tenant-slug';
 import { loadThemePage } from '@/themes/registry';
+import { notFound } from 'next/navigation';
 
 interface TenantPublicData {
   tenant: {
     name: string;
     slug: string;
     timezone: string;
-    rules: { cancel_before_hours: number };
+    rules: { cancel_before_hours: number; };
     themeId: string;
     pageThemes: Record<string, string> | null;
     branding: Record<string, string> | null;

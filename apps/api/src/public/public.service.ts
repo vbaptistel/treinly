@@ -1,17 +1,17 @@
 import {
-  Injectable,
-  NotFoundException,
   BadRequestException,
   ConflictException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
+import type { AvailabilityQuery, PublicCancelAppointment, PublicCreateAppointment } from '@treinly/validation';
 import { randomBytes } from 'crypto';
+import type { PrismaClient } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import type { PrismaClient } from '../../generated/prisma/client.js';
-import type { AvailabilityQuery, PublicCreateAppointment, PublicCancelAppointment } from '@treinly/validation';
 
 @Injectable()
 export class PublicService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async resolveHost(host: string) {
     const customDomain = await this.prisma.tenantCustomDomain.findUnique({
@@ -379,7 +379,7 @@ export class PublicService {
       throw new NotFoundException('Agendamento não encontrado');
     }
 
-    const rules = appointment.tenant.rules as { cancel_before_hours?: number };
+    const rules = appointment.tenant.rules as { cancel_before_hours?: number; };
     const cancelBeforeHours = rules.cancel_before_hours ?? 12;
     const cancelDeadline = new Date(
       appointment.startAt.getTime() - cancelBeforeHours * 60 * 60_000,
@@ -417,7 +417,7 @@ export class PublicService {
       throw new ConflictException('Agendamento não pode ser cancelado');
     }
 
-    const rules = appointment.tenant.rules as { cancel_before_hours?: number };
+    const rules = appointment.tenant.rules as { cancel_before_hours?: number; };
     const cancelBeforeHours = rules.cancel_before_hours ?? 12;
     const cancelDeadline = new Date(
       appointment.startAt.getTime() - cancelBeforeHours * 60 * 60_000,
