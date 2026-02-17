@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { getTenantSlug } from "@/lib/get-tenant-slug";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,10 +13,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Treinly",
-  description: "Agende seu horário",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const slug = await getTenantSlug();
+  const base: Metadata = {
+    title: "Treinly",
+    description: "Agende seu horário",
+  };
+  if (!slug || slug === "default") return base;
+  return {
+    ...base,
+    icons: [{ url: `/themes/${slug}/favicon.ico`, rel: "icon" }],
+  };
+}
 
 export default function RootLayout({
   children,

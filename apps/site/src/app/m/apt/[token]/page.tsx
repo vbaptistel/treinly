@@ -43,9 +43,6 @@ export async function generateMetadata({
     );
     return {
       title: `Agendamento — ${data.serviceName}`,
-      ...(data.themeId !== 'default' && {
-        icons: { icon: `/themes/${data.themeId}/favicon.ico` },
-      }),
     };
   } catch {
     return { title: 'Agendamento não encontrado' };

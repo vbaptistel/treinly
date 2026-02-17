@@ -32,9 +32,6 @@ export async function generateMetadata() {
     return {
       title: `${data.tenant.name}`,
       description: `Agende seu horário com ${data.tenant.name}`,
-      ...(slug !== 'default' && {
-        icons: [{ url: `/themes/${slug}/favicon.ico`, rel: 'icon' }],
-      }),
     };
   } catch {
     return { title: 'Profissional não encontrado' };
