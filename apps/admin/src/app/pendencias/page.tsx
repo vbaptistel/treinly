@@ -1,18 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { authApiFetch, ApiError } from '@/lib/auth-api';
-import { getToken } from '@/lib/auth';
-
-interface Appointment {
-  id: string;
-  startAt: string;
-  status: string;
-  billingStatus: string;
-  service: { name: string };
-  customer: { fullName: string; phoneE164: string };
-}
+import { useRouter } from 'next/navigation';
+import { getPendingAppointments, patchAppointment, type Appointment } from '@/app/actions/appointments';
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR', {
@@ -24,51 +15,45 @@ function formatDateTime(iso: string): string {
 }
 
 export default function PendenciasPage() {
+  const router = useRouter();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  async function fetchPending() {
+  const fetchPending = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try {
-      const token = getToken();
-      if (!token) {
-        setError('Sessão expirada. Faça login novamente.');
-        setLoading(false);
+    const result = await getPendingAppointments();
+    if ('error' in result) {
+      if (result.error === 'unauthorized') {
+        router.push('/login');
         return;
       }
-      const data = await authApiFetch<Appointment[]>('/appointments/pending', token);
-      setAppointments(data);
-    } catch {
-      setError('Erro ao carregar pendências.');
-    } finally {
-      setLoading(false);
+      setError(result.message ?? 'Erro ao carregar pendências.');
+    } else {
+      setAppointments(result.data);
     }
-  }
+    setLoading(false);
+  }, [router]);
 
   useEffect(() => {
     fetchPending();
-  }, []);
+  }, [fetchPending]);
 
   async function handleBilling(id: string, billingStatus: string) {
-    const token = getToken();
-    if (!token) return;
     setActionLoading(id);
-    try {
-      await authApiFetch(`/appointments/${id}`, token, {
-        method: 'PATCH',
-        body: JSON.stringify({ action: 'set_billing', billingStatus }),
-      });
-      await fetchPending();
-    } catch (err) {
-      if (err instanceof ApiError) {
-        alert(err.body?.message ?? 'Erro ao atualizar.');
+    const result = await patchAppointment(id, { action: 'set_billing', billingStatus });
+    setActionLoading(null);
+    if ('error' in result) {
+      if (result.error === 'unauthorized') {
+        router.push('/login');
+        return;
       }
-    } finally {
-      setActionLoading(null);
+      alert(result.message ?? 'Erro ao atualizar.');
+      return;
     }
+    await fetchPending();
   }
 
   return (

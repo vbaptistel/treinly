@@ -2,6 +2,17 @@ const COOKIE_NAME = 'sb-access-token';
 const COOKIE_MAX_AGE = 60 * 60; // 1h (o JWT do Supabase costuma expirar em 1h)
 
 /**
+ * Lê o token de acesso Supabase do cookie (server-side).
+ * Usar apenas em Server Components ou Server Actions.
+ */
+export async function getTokenFromCookies(): Promise<string | null> {
+  const { cookies } = await import('next/headers');
+  const store = await cookies();
+  const value = store.get(COOKIE_NAME)?.value;
+  return value ?? null;
+}
+
+/**
  * Lê o token de acesso Supabase do cookie (client-side).
  * Usado nas páginas do painel para chamadas à API autenticada.
  */

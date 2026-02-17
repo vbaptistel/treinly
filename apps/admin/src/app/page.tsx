@@ -2,18 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { authApiFetch, ApiError } from '@/lib/auth-api';
-import { getToken } from '@/lib/auth';
-
-interface Appointment {
-  id: string;
-  startAt: string;
-  endAt: string;
-  status: string;
-  billingStatus: string;
-  service: { name: string };
-  customer: { fullName: string; phoneE164: string };
-}
+import { useRouter } from 'next/navigation';
+import { getAppointments, patchAppointment, type Appointment } from '@/app/actions/appointments';
 
 const statusLabels: Record<string, string> = {
   BOOKED: 'Confirmado',
@@ -55,6 +45,7 @@ function getWeekRange(offset: number): { from: string; to: string; label: string
 }
 
 export default function AgendaPage() {
+  const router = useRouter();
   const [weekOffset, setWeekOffset] = useState(0);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,46 +57,36 @@ export default function AgendaPage() {
   const fetchAppointments = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try {
-      const token = getToken();
-      if (!token) {
-        setError('Sessão expirada. Faça login novamente.');
-        setLoading(false);
+    const result = await getAppointments(range.from, range.to);
+    if ('error' in result) {
+      if (result.error === 'unauthorized') {
+        router.push('/login');
         return;
       }
-      const data = await authApiFetch<Appointment[]>(
-        `/appointments?from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`,
-        token,
-      );
-      setAppointments(data);
-    } catch (err) {
-      setError('Erro ao carregar agenda.');
-    } finally {
-      setLoading(false);
+      setError(result.message ?? 'Erro ao carregar agenda.');
+    } else {
+      setAppointments(result.data);
     }
-  }, [range.from, range.to]);
+    setLoading(false);
+  }, [range.from, range.to, router]);
 
   useEffect(() => {
     fetchAppointments();
   }, [fetchAppointments]);
 
   async function handleAction(id: string, action: string, billingStatus?: string) {
-    const token = getToken();
-    if (!token) return;
     setActionLoading(id);
-    try {
-      await authApiFetch(`/appointments/${id}`, token, {
-        method: 'PATCH',
-        body: JSON.stringify({ action, billingStatus }),
-      });
-      await fetchAppointments();
-    } catch (err) {
-      if (err instanceof ApiError) {
-        alert(err.body?.message ?? 'Erro ao executar ação.');
+    const result = await patchAppointment(id, { action, billingStatus });
+    setActionLoading(null);
+    if ('error' in result) {
+      if (result.error === 'unauthorized') {
+        router.push('/login');
+        return;
       }
-    } finally {
-      setActionLoading(null);
+      alert(result.message ?? 'Erro ao executar ação.');
+      return;
     }
+    await fetchAppointments();
   }
 
   // Group by date
