@@ -48,7 +48,6 @@ export default async function AgendarPage({
   searchParams: Promise<{ serviceId?: string; }>;
 }) {
   const slug = await getTenantSlug();
-  console.log('slug:', slug);
   if (!slug) notFound();
 
   const { serviceId } = await searchParams;

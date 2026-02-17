@@ -2,20 +2,23 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  NotFoundException,
+  Logger,
+  NotFoundException
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { InviteMember, UpdateMemberRole } from '@treinly/validation';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { SupabaseService } from '../supabase/supabase.service.js';
-import type { InviteMember, UpdateMemberRole } from '@treinly/validation';
 
 @Injectable()
 export class TenantMembersService {
+  private readonly logger = new Logger(TenantMembersService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: SupabaseService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   findAll(tenantId: string) {
     return this.prisma.tenantUser.findMany({
@@ -37,6 +40,7 @@ export class TenantMembersService {
     const redirectTo = adminAppUrl
       ? `${adminAppUrl.replace(/\/$/, '')}/auth/confirmar-convite`
       : undefined;
+    this.logger.log(`redirectTo: ${redirectTo}`);
     const user = await this.supabase.inviteUserByEmail(data.email, {
       redirectTo,
     });
