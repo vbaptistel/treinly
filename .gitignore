@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+.vercel
+
+# NestJS
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Prisma
+packages/db/generated/
+
+# Logs e temporários
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.turbo
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testes (opcional: descomente se não quiser versionar reports)
+# coverage/
+# .nyc_output/
+
+# Supabase (local)
+.supabase/
+
+# Misc
+*.pem
+.cache/

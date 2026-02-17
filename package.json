@@ -1,0 +1,23 @@
+{
+  "name": "treinly",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter web dev\" \"pnpm --filter api start:dev\"",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api start:dev",
+    "build": "pnpm --filter @treinly/validation build && pnpm --filter web build && pnpm --filter api build",
+    "build:validation": "pnpm --filter @treinly/validation build",
+    "db:generate": "pnpm --filter @treinly/db db:generate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.8.1"
+  }
+}

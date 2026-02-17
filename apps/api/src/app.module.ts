@@ -1,0 +1,30 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { PrismaModule } from './prisma/prisma.module.js';
+import { SupabaseModule } from './supabase/supabase.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { SupabaseAuthGuard } from './auth/auth.guard.js';
+import { TenantGuard } from './auth/tenant.guard.js';
+import { ServicesModule } from './services/services.module.js';
+import { PublicModule } from './public/public.module.js';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    SupabaseModule,
+    AuthModule,
+    ServicesModule,
+    PublicModule,
+  ],
+  controllers: [AppController],
+  providers: [
+    AppService,
+    { provide: APP_GUARD, useClass: SupabaseAuthGuard },
+    { provide: APP_GUARD, useClass: TenantGuard },
+  ],
+})
+export class AppModule {}

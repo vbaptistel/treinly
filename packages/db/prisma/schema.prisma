@@ -1,0 +1,282 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  schema   = "treinly"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["treinly"]
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum Role {
+  OWNER
+  MEMBER
+
+  @@map("role")
+  @@schema("treinly")
+}
+
+enum AppointmentStatus {
+  BOOKED
+  CANCELED
+  NO_SHOW
+  DONE
+
+  @@map("appointment_status")
+  @@schema("treinly")
+}
+
+enum AppointmentSource {
+  PUBLIC
+  ADMIN
+
+  @@map("appointment_source")
+  @@schema("treinly")
+}
+
+enum BillingStatus {
+  COVERED
+  PENDING
+  PAID_MANUAL
+  WAIVED
+
+  @@map("billing_status")
+  @@schema("treinly")
+}
+
+enum CustomerPlanType {
+  PACKAGE
+  MONTHLY
+
+  @@map("customer_plan_type")
+  @@schema("treinly")
+}
+
+enum CustomerPlanStatus {
+  ACTIVE
+  EXPIRED
+
+  @@map("customer_plan_status")
+  @@schema("treinly")
+}
+
+enum LedgerReason {
+  BOOKED_CONSUME
+  CANCELED_REFUND
+  ADMIN_ADJUST
+
+  @@map("ledger_reason")
+  @@schema("treinly")
+}
+
+enum SaasSubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+
+  @@map("saas_subscription_status")
+  @@schema("treinly")
+}
+
+enum CanceledBy {
+  PUBLIC
+  ADMIN
+
+  @@map("canceled_by")
+  @@schema("treinly")
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model Tenant {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String   @unique
+  timezone  String   @default("America/Sao_Paulo")
+  rules     Json     @default("{\"cancel_before_hours\":12,\"package_validity_days_default\":60,\"min_notice_minutes_default\":120}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  tenantUsers       TenantUser[]
+  services          Service[]
+  customers         Customer[]
+  availabilityRules TenantAvailabilityRule[]
+  timeOffs          TenantTimeOff[]
+  customerPlans     CustomerPlan[]
+  appointments      Appointment[]
+  ledgerEntries     PlanSessionLedger[]
+  saasSubscription  SaasSubscription?
+
+  @@map("tenants")
+  @@schema("treinly")
+}
+
+model TenantUser {
+  tenantId  String   @map("tenant_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  role      Role     @default(OWNER)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@id([tenantId, userId])
+  @@map("tenant_users")
+  @@schema("treinly")
+}
+
+model Service {
+  id                  String   @id @default(uuid()) @db.Uuid
+  tenantId            String   @map("tenant_id") @db.Uuid
+  name                String
+  durationMinutes     Int      @map("duration_minutes")
+  slotMinutes         Int      @map("slot_minutes")
+  minNoticeMinutes    Int      @default(120) @map("min_notice_minutes")
+  bufferBeforeMinutes Int      @default(0) @map("buffer_before_minutes")
+  bufferAfterMinutes  Int      @default(0) @map("buffer_after_minutes")
+  priceCents          Int?     @map("price_cents")
+  active              Boolean  @default(true)
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@map("services")
+  @@schema("treinly")
+}
+
+model Customer {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  fullName  String   @map("full_name")
+  phoneE164 String   @map("phone_e164")
+  email     String?
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  plans        CustomerPlan[]
+  appointments Appointment[]
+
+  @@unique([tenantId, phoneE164])
+  @@map("customers")
+  @@schema("treinly")
+}
+
+model TenantAvailabilityRule {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  weekday   Int
+  startTime DateTime @map("start_time") @db.Time
+  endTime   DateTime @map("end_time") @db.Time
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_availability_rules")
+  @@schema("treinly")
+}
+
+model TenantTimeOff {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  startAt   DateTime @map("start_at") @db.Timestamptz
+  endAt     DateTime @map("end_at") @db.Timestamptz
+  reason    String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_time_off")
+  @@schema("treinly")
+}
+
+model CustomerPlan {
+  id            String             @id @default(uuid()) @db.Uuid
+  tenantId      String             @map("tenant_id") @db.Uuid
+  customerId    String             @map("customer_id") @db.Uuid
+  type          CustomerPlanType
+  sessionsTotal Int                @map("sessions_total")
+  sessionsUsed  Int                @default(0) @map("sessions_used")
+  validUntil    DateTime           @map("valid_until") @db.Date
+  status        CustomerPlanStatus @default(ACTIVE)
+  createdAt     DateTime           @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant        Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer      Customer            @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  ledgerEntries PlanSessionLedger[]
+
+  @@map("customer_plans")
+  @@schema("treinly")
+}
+
+model Appointment {
+  id         String @id @default(uuid()) @db.Uuid
+  tenantId   String @map("tenant_id") @db.Uuid
+  customerId String @map("customer_id") @db.Uuid
+  serviceId  String @map("service_id") @db.Uuid
+
+  startAt     DateTime @map("start_at") @db.Timestamptz
+  endAt       DateTime @map("end_at") @db.Timestamptz
+  busyStartAt DateTime @map("busy_start_at") @db.Timestamptz
+  busyEndAt   DateTime @map("busy_end_at") @db.Timestamptz
+
+  status        AppointmentStatus @default(BOOKED)
+  source        AppointmentSource
+  billingStatus BillingStatus     @default(PENDING) @map("billing_status")
+
+  publicManageToken          String?   @unique @map("public_manage_token")
+  publicManageTokenExpiresAt DateTime? @map("public_manage_token_expires_at") @db.Timestamptz
+
+  canceledAt     DateTime?   @map("canceled_at") @db.Timestamptz
+  canceledBy     CanceledBy? @map("canceled_by")
+  canceledReason String?     @map("canceled_reason")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant        Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer      Customer            @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  service       Service             @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  ledgerEntries PlanSessionLedger[]
+
+  @@index([tenantId, startAt])
+  @@map("appointments")
+  @@schema("treinly")
+}
+
+model PlanSessionLedger {
+  id             String       @id @default(uuid()) @db.Uuid
+  tenantId       String       @map("tenant_id") @db.Uuid
+  customerPlanId String       @map("customer_plan_id") @db.Uuid
+  appointmentId  String?      @map("appointment_id") @db.Uuid
+  delta          Int
+  reason         LedgerReason
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customerPlan CustomerPlan @relation(fields: [customerPlanId], references: [id], onDelete: Cascade)
+  appointment  Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@unique([appointmentId, reason])
+  @@map("plan_session_ledger")
+  @@schema("treinly")
+}
+
+model SaasSubscription {
+  tenantId              String                 @id @map("tenant_id") @db.Uuid
+  status                SaasSubscriptionStatus
+  trialEndsAt           DateTime?              @map("trial_ends_at") @db.Timestamptz
+  currentPeriodEnd      DateTime?              @map("current_period_end") @db.Timestamptz
+  gatewayCustomerId     String?                @map("gateway_customer_id")
+  gatewaySubscriptionId String?                @map("gateway_subscription_id")
+  createdAt             DateTime               @default(now()) @map("created_at") @db.Timestamptz
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("saas_subscriptions")
+  @@schema("treinly")
+}
