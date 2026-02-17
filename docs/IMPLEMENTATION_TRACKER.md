@@ -96,52 +96,52 @@ Arquivo para acompanhar progresso. Marque com `[x]` quando concluído.
 ## Milestone 4 — Painel
 
 ### Fase 4.1 — GET /me
-- [ ] Retorna tenant + status assinatura SaaS
+- [x] Retorna tenant + status assinatura SaaS
 
 ### Fase 4.2 — Agenda
-- [ ] GET /appointments?from=...&to=...
-- [ ] Página agenda dia/semana
-- [ ] Visualização de appointments
+- [x] GET /appointments?from=...&to=...
+- [x] Página agenda dia/semana
+- [x] Visualização de appointments
 
 ### Fase 4.3 — Pendências
-- [ ] Lista appointments PENDING
-- [ ] UI no painel
+- [x] Lista appointments PENDING
+- [x] UI no painel
 
 ### Fase 4.4 — Ações rápidas
-- [ ] PATCH /appointments/:id: cancelar (ADMIN)
-- [ ] PATCH /appointments/:id: marcar no-show
-- [ ] PATCH /appointments/:id: marcar done
-- [ ] PATCH /appointments/:id: alterar billing_status (PAID_MANUAL, WAIVED)
-- [ ] UI com botões para cada ação
+- [x] PATCH /appointments/:id: cancelar (ADMIN)
+- [x] PATCH /appointments/:id: marcar no-show
+- [x] PATCH /appointments/:id: marcar done
+- [x] PATCH /appointments/:id: alterar billing_status (PAID_MANUAL, WAIVED)
+- [x] UI com botões para cada ação
 
 ### Fase 4.5 — Customers e Plans
-- [ ] GET /customers
-- [ ] POST /customers
-- [ ] GET /customers/:id
-- [ ] POST /customers/:id/plans (PACKAGE/MONTHLY)
+- [x] GET /customers
+- [x] POST /customers
+- [x] GET /customers/:id
+- [x] POST /customers/:id/plans (PACKAGE/MONTHLY)
 
 ---
 
 ## Milestone 5 — Billing SaaS
 
 ### Fase 5.1 — Tabela e seed
-- [ ] saas_subscriptions no schema
-- [ ] Seed ou fluxo inicial TRIAL
+- [x] saas_subscriptions no schema
+- [x] Seed ou fluxo inicial TRIAL
 
 ### Fase 5.2 — Checkout
-- [ ] POST /billing/checkout-session
-- [ ] Integração com gateway (Stripe ou similar)
+- [x] POST /billing/checkout-session
+- [x] Integração com gateway (Stripe ou similar)
 
 ### Fase 5.3 — Webhooks
-- [ ] POST /billing/webhook
-- [ ] Atualizar saas_subscriptions.status
-- [ ] Assinatura de webhook
+- [x] POST /billing/webhook
+- [x] Atualizar saas_subscriptions.status
+- [x] Assinatura de webhook
 
 ### Fase 5.4 — Bloqueios
-- [ ] Guard/middleware checar status
-- [ ] TRIAL/ACTIVE: acesso total
-- [ ] PAST_DUE: política definida
-- [ ] CANCELED/EXPIRED: bloqueio ou só leitura
+- [x] Guard/middleware checar status
+- [x] TRIAL/ACTIVE: acesso total
+- [x] PAST_DUE: política definida
+- [x] CANCELED/EXPIRED: bloqueio ou só leitura
 
 ---
 
@@ -189,9 +189,9 @@ Implementação do plano em [docs/HOTSITE_THEMES.md](docs/HOTSITE_THEMES.md): UR
 
 | Milestone | Fases | Concluído |
 |-----------|-------|-----------|
-| M1 Fundação | 6 | 5/6 |
-| M2 Agendamento | 3 | 0/3 |
+| M1 Fundação | 6 | 6/6 |
+| M2 Agendamento | 3 | 3/3 |
 | M3 Cancelamento | 4 | 4/4 |
-| M4 Painel | 5 | 0/5 |
-| M5 Billing | 4 | 0/4 |
+| M4 Painel | 5 | 5/5 |
+| M5 Billing | 4 | 4/4 |
 | M6 Hotsite (subdomínio, temas, branding) | 7 | 0/7 |

@@ -10,6 +10,11 @@ import { SupabaseAuthGuard } from './auth/auth.guard.js';
 import { TenantGuard } from './auth/tenant.guard.js';
 import { ServicesModule } from './services/services.module.js';
 import { PublicModule } from './public/public.module.js';
+import { MeModule } from './me/me.module.js';
+import { AppointmentsModule } from './appointments/appointments.module.js';
+import { CustomersModule } from './customers/customers.module.js';
+import { BillingModule } from './billing/billing.module.js';
+import { SaasGuard } from './auth/saas.guard.js';
 
 @Module({
   imports: [
@@ -19,12 +24,17 @@ import { PublicModule } from './public/public.module.js';
     AuthModule,
     ServicesModule,
     PublicModule,
+    MeModule,
+    AppointmentsModule,
+    CustomersModule,
+    BillingModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     { provide: APP_GUARD, useClass: SupabaseAuthGuard },
     { provide: APP_GUARD, useClass: TenantGuard },
+    { provide: APP_GUARD, useClass: SaasGuard },
   ],
 })
 export class AppModule {}
