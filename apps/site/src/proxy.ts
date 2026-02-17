@@ -29,10 +29,15 @@ function extractSubdomainSlug(host: string): string | null {
 export async function proxy(request: NextRequest) {
   const host = request.nextUrl.hostname;
   console.log('---- HEADERS ----');
-  request.headers.forEach((v, k) => {
-    console.log(k, v);
-  });
-  console.log('nextUrl', request.nextUrl.href);
+  const debug = {
+    host: request.headers.get('host'),
+    xForwardedHost: request.headers.get('x-forwarded-host'),
+    xForwardedProto: request.headers.get('x-forwarded-proto'),
+    xRealIp: request.headers.get('x-real-ip'),
+    nextUrl: request.nextUrl.href,
+  };
+
+  console.log(debug);
 
   let slug: string | null = null;
 
