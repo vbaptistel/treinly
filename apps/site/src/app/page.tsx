@@ -30,7 +30,7 @@ export async function generateMetadata() {
   try {
     const data = await apiFetch<TenantPublicData>(`/public/${slug}`);
     return {
-      title: `${data.tenant.name} — Agendar`,
+      title: `${data.tenant.name}`,
       description: `Agende seu horário com ${data.tenant.name}`,
       ...(slug !== 'default' && {
         icons: { icon: `/themes/${slug}/favicon.ico` },
