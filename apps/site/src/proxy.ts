@@ -28,6 +28,7 @@ function extractSubdomainSlug(host: string): string | null {
 
 export async function proxy(request: NextRequest) {
   const host = request.nextUrl.hostname;
+  console.log('host:', host);
 
   let slug: string | null = null;
 
