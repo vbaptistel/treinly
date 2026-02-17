@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 // Hosts que não são subdomínios de tenant
-const PLATFORM_HOSTS = ['treinly.com', 'www.treinly.com'];
+const PLATFORM_HOSTS = ['treinly.app', 'www.treinly.app'];
 
 function isIP(host: string): boolean {
   return /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/.test(host) || host.startsWith('[');
@@ -27,7 +27,7 @@ function extractSubdomainSlug(host: string): string | null {
 }
 
 export async function proxy(request: NextRequest) {
-  const host = request.headers.get('host') ?? '';
+  const host = request.headers.get('x-forwarded-host') ?? '';
 
   let slug: string | null = null;
 
