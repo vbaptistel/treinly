@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { SupabaseService } from '../supabase/supabase.service.js';
 import type { InviteMember, UpdateMemberRole } from '@treinly/validation';
@@ -13,6 +14,7 @@ export class TenantMembersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly supabase: SupabaseService,
+    private readonly configService: ConfigService,
   ) {}
 
   findAll(tenantId: string) {
@@ -31,7 +33,13 @@ export class TenantMembersService {
       throw new ConflictException('Este email já é membro deste tenant');
     }
 
-    const user = await this.supabase.inviteUserByEmail(data.email);
+    const adminAppUrl = this.configService.get<string>('ADMIN_APP_URL');
+    const redirectTo = adminAppUrl
+      ? `${adminAppUrl.replace(/\/$/, '')}/auth/confirmar-convite`
+      : undefined;
+    const user = await this.supabase.inviteUserByEmail(data.email, {
+      redirectTo,
+    });
 
     return this.prisma.tenantUser.create({
       data: {

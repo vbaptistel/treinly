@@ -26,8 +26,14 @@ export class SupabaseService {
     };
   }
 
-  async inviteUserByEmail(email: string): Promise<{ id: string; email: string }> {
-    const { data, error } = await this.client.auth.admin.inviteUserByEmail(email);
+  async inviteUserByEmail(
+    email: string,
+    options?: { redirectTo?: string },
+  ): Promise<{ id: string; email: string }> {
+    const { data, error } = await this.client.auth.admin.inviteUserByEmail(
+      email,
+      options,
+    );
     if (error) throw error;
     return { id: data.user.id, email: data.user.email! };
   }

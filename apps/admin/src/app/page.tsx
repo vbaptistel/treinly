@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { authApiFetch, ApiError } from '@/lib/auth-api';
 import { getToken } from '@/lib/auth';
 
@@ -146,6 +147,12 @@ export default function AgendaPage() {
       {error && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
           {error}
+          <Link
+            href="/login"
+            className="ml-1 font-medium underline hover:no-underline"
+          >
+            Fazer login
+          </Link>
         </div>
       )}
 

@@ -79,6 +79,19 @@ Estratégia:
 - `@Roles('OWNER', 'PLATFORM_ADMIN')` = somente OWNER e PLATFORM_ADMIN.
 - `PLATFORM_ADMIN` nunca é atribuído via invite — gerenciado manualmente.
 
+## Convite de membros do tenant (login e senha)
+
+1. OWNER/PLATFORM_ADMIN chama `POST /tenant-members` com email e role.
+2. API chama `Supabase Auth: inviteUserByEmail(email, { redirectTo })`. O `redirectTo` é montado a partir de `ADMIN_APP_URL` (ex.: `https://admin.treinly.com/auth/confirmar-convite`).
+3. O convidado recebe o e-mail do Supabase com um link. Ao clicar, é redirecionado para a URL acima com tokens no hash.
+4. A página **Confirmar convite** (`/auth/confirmar-convite`) lê o hash, chama `setSession`, exibe o formulário **Definir senha** e, após `updateUser({ password })`, grava o token no cookie e redireciona para a agenda.
+5. Nos acessos seguintes, o membro usa a página **Login** (`/login`) com e-mail e senha.
+
+**Variáveis de ambiente:**
+
+- **API:** `ADMIN_APP_URL` — URL base do app admin (ex.: `http://localhost:3000` em dev). Usada para montar o `redirectTo` do convite. O Supabase exige que essa URL de redirect esteja em **Authentication → URL Configuration → Redirect URLs**.
+- **Admin:** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — para o cliente Supabase no browser (login e confirmar-convite).
+
 ## Componentes por módulo (monolito modular)
 
 - Auth & Tenant
