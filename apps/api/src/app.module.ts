@@ -8,6 +8,7 @@ import { SupabaseModule } from './supabase/supabase.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { SupabaseAuthGuard } from './auth/auth.guard.js';
 import { TenantGuard } from './auth/tenant.guard.js';
+import { RolesGuard } from './auth/roles.guard.js';
 import { ServicesModule } from './services/services.module.js';
 import { PublicModule } from './public/public.module.js';
 import { MeModule } from './me/me.module.js';
@@ -15,6 +16,7 @@ import { AppointmentsModule } from './appointments/appointments.module.js';
 import { CustomersModule } from './customers/customers.module.js';
 import { BillingModule } from './billing/billing.module.js';
 import { SaasGuard } from './auth/saas.guard.js';
+import { TenantMembersModule } from './tenant-members/tenant-members.module.js';
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { SaasGuard } from './auth/saas.guard.js';
     AppointmentsModule,
     CustomersModule,
     BillingModule,
+    TenantMembersModule,
   ],
   controllers: [AppController],
   providers: [
@@ -35,6 +38,7 @@ import { SaasGuard } from './auth/saas.guard.js';
     { provide: APP_GUARD, useClass: SupabaseAuthGuard },
     { provide: APP_GUARD, useClass: TenantGuard },
     { provide: APP_GUARD, useClass: SaasGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
 export class AppModule {}

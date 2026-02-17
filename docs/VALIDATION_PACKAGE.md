@@ -22,6 +22,16 @@
 - `PublicCancelAppointmentSchema`:
   - reason?
 
+## Esquemas do painel (app.ts)
+
+- `CreateServiceSchema` / `UpdateServiceSchema` — CRUD de serviços.
+- `AppointmentsQuerySchema` — filtro por `from`/`to` (datetime).
+- `PatchAppointmentSchema` — ações: cancel, no_show, done, set_billing.
+- `CreateCustomerSchema` — nome, telefone, email?, notes?.
+- `CreatePlanSchema` — type (PACKAGE/MONTHLY), sessionsTotal, validUntil.
+- `InviteMemberSchema` — `{ email, role }` (role: `OWNER` | `MEMBER`, default `MEMBER`).
+- `UpdateMemberRoleSchema` — `{ role }` (role: `OWNER` | `MEMBER`). Nota: `PLATFORM_ADMIN` não é atribuível via invite.
+
 ## Política de telefone
 
 - Zod valida apenas presença e tamanho mínimo.

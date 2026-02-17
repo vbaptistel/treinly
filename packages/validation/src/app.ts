@@ -58,3 +58,16 @@ export const CreatePlanSchema = z.object({
 });
 
 export type CreatePlan = z.infer<typeof CreatePlanSchema>;
+
+// --- Tenant Members ---
+
+export const InviteMemberSchema = z.object({
+  email: z.string().email(),
+  role: z.enum(['OWNER', 'MEMBER']).default('MEMBER'),
+});
+export type InviteMember = z.infer<typeof InviteMemberSchema>;
+
+export const UpdateMemberRoleSchema = z.object({
+  role: z.enum(['OWNER', 'MEMBER']),
+});
+export type UpdateMemberRole = z.infer<typeof UpdateMemberRoleSchema>;

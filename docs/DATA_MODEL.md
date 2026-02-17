@@ -3,7 +3,7 @@
 ## Entidades principais
 
 - Tenant (profissional)
-- TenantUser (ligação usuário→tenant, role)
+- TenantUser (ligação usuário→tenant, role, email)
 - Service (serviços, duração, slot variável, buffers, notice)
 - Customer (cliente; dedupe por telefone)
 - Appointment (agendamento; anti-overlap no DB; token público)
@@ -22,3 +22,10 @@
 
 - Backend normaliza `phone` para `phone_e164`.
 - Upsert por `(tenant_id, phone_e164)`.
+
+## Roles
+
+- `tenant_users.role`: `OWNER`, `MEMBER`, `PLATFORM_ADMIN` (enum no Prisma).
+- `OWNER` e `MEMBER` são roles de tenant — armazenados em `tenant_users`.
+- `PLATFORM_ADMIN` existe no enum para tipagem, mas na prática vive em `app_metadata` do Supabase Auth.
+- `tenant_users.email`: armazenado na criação (invite) para facilitar listagem sem join com `auth.users`.

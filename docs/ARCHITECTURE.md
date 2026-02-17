@@ -54,9 +54,35 @@ Estratégia:
 - Consumo: `delta=-1` e reason `BOOKED_CONSUME`
 - Estorno: `delta=+1` e reason `CANCELED_REFUND`
 
+## Roles & Autorização
+
+### Roles de tenant
+- `OWNER` e `MEMBER` — armazenados em `tenant_users.role`.
+- Resolvidos pelo `TenantGuard` via query em `tenant_users` a cada request.
+
+### PLATFORM_ADMIN
+- Não pertence a nenhum tenant — role especial para administração da plataforma.
+- Armazenado no `app_metadata` do Supabase Auth: `{ "platform_role": "PLATFORM_ADMIN" }`.
+- `TenantGuard` detecta via `request.user.platformRole` (retornado por `SupabaseService.verifyToken()`).
+- Quando identificado: `request.tenantId = null`, `request.tenantRole = 'PLATFORM_ADMIN'`.
+- Pula checagem de SaaS subscription (`SaasGuard` retorna `true` quando `tenantId` é `null`).
+- Conceder role: `supabase.auth.admin.updateUserById(id, { app_metadata: { platform_role: 'PLATFORM_ADMIN' } })`.
+
+### Guard chain (ordem de execução)
+1. `SupabaseAuthGuard` — valida JWT, seta `request.user = { id, email, platformRole }`.
+2. `TenantGuard` — resolve `tenantId` + `tenantRole` (via `tenant_users` ou `app_metadata`).
+3. `SaasGuard` — bloqueia tenants com subscription expirada/cancelada.
+4. `RolesGuard` — checa `@Roles()` decorator contra `request.tenantRole`.
+
+### Decorator @Roles()
+- Sem `@Roles()` no controller/handler = liberado para qualquer role autenticado.
+- `@Roles('OWNER', 'PLATFORM_ADMIN')` = somente OWNER e PLATFORM_ADMIN.
+- `PLATFORM_ADMIN` nunca é atribuído via invite — gerenciado manualmente.
+
 ## Componentes por módulo (monolito modular)
 
 - Auth & Tenant
+- Tenant Members (CRUD + invite)
 - Public Pages
 - Scheduling
 - Customers

@@ -17,6 +17,18 @@ export class SupabaseService {
     if (error || !data.user) {
       return null;
     }
-    return { id: data.user.id, email: data.user.email };
+    const platformRole =
+      (data.user.app_metadata as Record<string, unknown>)?.platform_role;
+    return {
+      id: data.user.id,
+      email: data.user.email,
+      platformRole: platformRole === 'PLATFORM_ADMIN' ? 'PLATFORM_ADMIN' as const : null,
+    };
+  }
+
+  async inviteUserByEmail(email: string): Promise<{ id: string; email: string }> {
+    const { data, error } = await this.client.auth.admin.inviteUserByEmail(email);
+    if (error) throw error;
+    return { id: data.user.id, email: data.user.email! };
   }
 }

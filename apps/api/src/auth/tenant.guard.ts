@@ -18,13 +18,19 @@ export class TenantGuard implements CanActivate {
     if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest();
-    const userId = request.user?.id;
-    if (!userId) {
+    const user = request.user;
+    if (!user?.id) {
       throw new ForbiddenException('Usuário não autenticado');
     }
 
+    if (user.platformRole === 'PLATFORM_ADMIN') {
+      request.tenantId = null;
+      request.tenantRole = 'PLATFORM_ADMIN';
+      return true;
+    }
+
     const tenantUser = await this.prismaService.tenantUser.findFirst({
-      where: { userId },
+      where: { userId: user.id },
     });
 
     if (!tenantUser) {

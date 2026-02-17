@@ -22,10 +22,12 @@ create table treinly.tenants (
 create table treinly.tenant_users (
   tenant_id uuid not null references treinly.tenants(id) on delete cascade,
   user_id uuid not null, -- supabase auth.users.id
-  role text not null default 'OWNER',
+  role text not null default 'OWNER', -- OWNER, MEMBER, PLATFORM_ADMIN
+  email text not null,
   created_at timestamptz not null default now(),
   primary key (tenant_id, user_id)
 );
+-- Nota: PLATFORM_ADMIN existe no enum mas na prática vive em app_metadata do Supabase Auth.
 
 -- Services
 create table treinly.services (

@@ -117,6 +117,22 @@ Retorna tenant do usuário + status da assinatura SaaS.
   - define sessions_total, valid_until
   - (futuro) renovar
 
+### Tenant Members (OWNER e PLATFORM_ADMIN)
+
+Requer `@Roles('OWNER', 'PLATFORM_ADMIN')`.
+PLATFORM_ADMIN pode operar em qualquer tenant via `?tenantId=`.
+
+- GET /tenant-members`(?tenantId=)` — listar membros do tenant
+- POST /tenant-members`(?tenantId=)` — convidar membro (envia email via Supabase Auth)
+  - Body: `{ "email": "novo@email.com", "role": "MEMBER" }` (role: `OWNER` | `MEMBER`, default `MEMBER`)
+  - 409: email já é membro do tenant
+- PATCH /tenant-members/:userId`(?tenantId=)` — atualizar role
+  - Body: `{ "role": "OWNER" }`
+  - 400: não pode alterar o próprio role
+- DELETE /tenant-members/:userId`(?tenantId=)` — remover membro
+  - 400: não pode remover a si mesmo
+  - 400: não pode remover o último OWNER
+
 ## Billing SaaS
 
 ### POST /billing/checkout-session

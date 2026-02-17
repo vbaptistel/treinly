@@ -15,6 +15,7 @@ datasource db {
 enum Role {
   OWNER
   MEMBER
+  PLATFORM_ADMIN
 
   @@map("role")
   @@schema("treinly")
@@ -125,6 +126,7 @@ model TenantUser {
   tenantId  String   @map("tenant_id") @db.Uuid
   userId    String   @map("user_id") @db.Uuid
   role      Role     @default(OWNER)
+  email     String
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)

@@ -55,6 +55,15 @@ When building out, expect:
 - Public routes: resolve `tenant_id` from URL `slug`.
 - All panel queries must filter by `tenant_id`.
 
+### Roles & Autorização
+- Roles do tenant (`OWNER`, `MEMBER`) vivem em `tenant_users.role` (banco).
+- `PLATFORM_ADMIN` **não é role de tenant** — vive no `app_metadata` do Supabase Auth (`{ "platform_role": "PLATFORM_ADMIN" }`).
+- Guard chain (ordem): `SupabaseAuthGuard` → `TenantGuard` → `SaasGuard` → `RolesGuard`.
+- `TenantGuard`: se `app_metadata.platform_role === 'PLATFORM_ADMIN'`, seta `request.tenantId = null` e `request.tenantRole = 'PLATFORM_ADMIN'` (sem query em `tenant_users`).
+- `SaasGuard`: pula checagem quando `tenantId = null` (PLATFORM_ADMIN).
+- `RolesGuard`: checa `@Roles()` decorator contra `request.tenantRole`. Sem `@Roles()` = liberado para qualquer role autenticado.
+- Use `@Roles('OWNER', 'PLATFORM_ADMIN')` para restringir endpoints. Nunca atribua `PLATFORM_ADMIN` via invite — role gerenciado via `supabase.auth.admin.updateUserById()`.
+
 ### Anti-Overbooking (DB-level)
 - `EXCLUDE USING GIST` constraint on `appointments` using `tstzrange(busy_start_at, busy_end_at, '[)')` where `status = 'BOOKED'`.
 - Prisma cannot create EXCLUDE constraints — add them in manual SQL migration steps after `prisma migrate`.
@@ -117,9 +126,11 @@ Ambas as apps chamam a NestJS API (`NEXT_PUBLIC_API_URL`).
 | Appointment | billing_status | `COVERED`, `PENDING`, `PAID_MANUAL`, `WAIVED` |
 | SaaSSubscription | status | `TRIAL`, `ACTIVE`, `PAST_DUE`, `CANCELED`, `EXPIRED` |
 | CustomerPlan | type | `PACKAGE`, `MONTHLY` |
+| TenantUser | role | `OWNER`, `MEMBER`, `PLATFORM_ADMIN` |
 
 ## Security
 
 - Public token must be random, unique, and should expire (e.g., `start_at + 30 days`).
 - Panel always requires valid JWT (Supabase Auth).
 - Public routes never write to Supabase directly — always through NestJS.
+- PLATFORM_ADMIN é identificado via `app_metadata.platform_role` no Supabase Auth (não via `tenant_users`). Conceder via SDK ou SQL diretamente.
